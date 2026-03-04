@@ -34,14 +34,19 @@ export function TextSearchBar({
         onChange={(e) => setSearchQuery(e.target.value)}
         error={!!regexError}
         helperText={regexError}
+        className="w-64"
         inputProps={{
           sx: {
             "&::placeholder": {
               textAlign: "right",
+              fontSize: "14px",
             },
           },
         }}
         InputProps={{
+          style: {
+            fontSize: 14,
+          },
           endAdornment: (
             <InputAdornment position="end">
               <Tooltip

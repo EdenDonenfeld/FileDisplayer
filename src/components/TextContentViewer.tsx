@@ -21,7 +21,7 @@ export function TextContentViewer({
 
   return (
     <div
-      className="flex-1 min-h-0 overflow-auto p-4 font-mono text-sm whitespace-pre-wrap break-words"
+      className="flex-1 min-h-0 overflow-auto p-4 font-mono text-sm wrap-break-word whitespace-pre-wrap"
       dir="ltr"
     >
       {isLoading ? (

@@ -17,7 +17,9 @@ export type UseTextSearchResult = {
   handlePrev: () => void;
 };
 
-export function useTextSearch(fileUri: string | undefined): UseTextSearchResult {
+export function useTextSearch(
+  fileUri: string | undefined,
+): UseTextSearchResult {
   const [content, setContent] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [useRegex, setUseRegex] = useState(false);
@@ -88,14 +90,12 @@ export function useTextSearch(fileUri: string | undefined): UseTextSearchResult 
   }, [searchQuery, useRegex]);
 
   const handleNext = useCallback(() => {
-    setCurrentMatchIndex((prev) =>
-      (prev + 1) % Math.max(matchCount, 1)
-    );
+    setCurrentMatchIndex((prev) => (prev + 1) % Math.max(matchCount, 1));
   }, [matchCount]);
 
   const handlePrev = useCallback(() => {
-    setCurrentMatchIndex((prev) =>
-      (prev - 1 + matchCount) % Math.max(matchCount, 1)
+    setCurrentMatchIndex(
+      (prev) => (prev - 1 + matchCount) % Math.max(matchCount, 1),
     );
   }, [matchCount]);
 
