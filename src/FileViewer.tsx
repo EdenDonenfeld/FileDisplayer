@@ -9,14 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  Check,
   CheckRounded,
   CloseRounded,
-  ContentCopyOutlined,
+  CloudDownloadOutlined,
   ContentCopyRounded,
+  ErrorOutlineOutlined,
 } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { FileContentModal } from "./FileContentModal";
+import { ActionButton } from "./ActionButton";
 
 const supportedTypes = new Set(
   DocViewerRenderers.flatMap(
@@ -48,7 +49,8 @@ export type FileViewerProps = {
 
 export function FileViewer({ fileUrl, title }: FileViewerProps) {
   const [open, setOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState<boolean | undefined>();
+  const [isDownloaded, setIsDownloaded] = useState<boolean | undefined>();
 
   const { docs, isTextBased, label } = useMemo(() => {
     const fileExtension = fileUrl
@@ -88,10 +90,38 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
       setIsCopied(true);
 
       setTimeout(() => {
-        setIsCopied(false);
+        setIsCopied(undefined);
       }, 2000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
+      setIsCopied(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = label;
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      setIsDownloaded(true);
+
+      setTimeout(() => {
+        setIsDownloaded(undefined);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to download file: ", err);
+      setIsDownloaded(false);
     }
   };
 
@@ -101,9 +131,12 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
         sx={{ textTransform: "none" }}
         size="small"
         variant="contained"
+        color="inherit"
         onClick={() => setOpen(true)}
       >
-        {label}
+        <Typography fontSize="14px" color="textPrimary">
+          {label}
+        </Typography>
       </Button>
 
       <Dialog
@@ -115,15 +148,24 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
         <DialogTitle>
           <div className="flex flex-row justify-between items-center">
             <Typography>{label}</Typography>
-            {isCopied ? (
-              <IconButton>
-                <CheckRounded color="success" fontSize="small" />
-              </IconButton>
-            ) : (
-              <IconButton onClick={handleCopyContent}>
-                <ContentCopyRounded fontSize="small" />
-              </IconButton>
-            )}
+            <div className="flex flex-row gap-1 items-center">
+              <ActionButton
+                title="העתק תוכן"
+                isSuccess={isCopied}
+                handleAction={handleCopyContent}
+                actionIcon={
+                  <ContentCopyRounded color="inherit" fontSize="small" />
+                }
+              />
+              <ActionButton
+                title="הורד קובץ"
+                isSuccess={isDownloaded}
+                handleAction={handleDownload}
+                actionIcon={
+                  <CloudDownloadOutlined color="inherit" fontSize="small" />
+                }
+              />
+            </div>
           </div>
         </DialogTitle>
         <DialogContent sx={{ p: 0 }} dividers>

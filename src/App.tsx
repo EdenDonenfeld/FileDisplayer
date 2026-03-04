@@ -1,10 +1,10 @@
-import { FileViewer } from './FileViewer'
-import { Stack, Typography } from '@mui/material'
+import { FileViewer } from "./FileViewer";
+import { Stack, Typography } from "@mui/material";
 
 function App() {
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <Typography variant="h4" sx={{ mb: 2, color: 'white' }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
         Files
       </Typography>
       <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
@@ -13,11 +13,14 @@ function App() {
         <FileViewer fileUrl="/files/first_pdf.pdf" title="first_pdf.pdf" />
         <FileViewer fileUrl="/files/logo.png" title="logo.png" />
         <FileViewer fileUrl="/files/document.docx" title="document.docx" />
-        <FileViewer fileUrl="/files/presentation.pptx" title="presentation.pptx" />
+        <FileViewer
+          fileUrl="/files/presentation.pptx"
+          title="presentation.pptx"
+        />
         <FileViewer fileUrl="/files/data.js" title="data.js" />
       </Stack>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
