@@ -1,4 +1,4 @@
-import { FileViewer } from "./FileViewer";
+import { FileViewer } from "./components/FileViewer";
 import { Stack, Typography } from "@mui/material";
 
 function App() {

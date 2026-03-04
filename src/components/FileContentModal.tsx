@@ -1,7 +1,7 @@
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import { DocItem } from "./FileViewer";
-import { TextContentViewer } from "./components/TextContentViewer";
-import type { UseTextSearchResult } from "./hooks/useTextSearch";
+import { TextContentViewer } from "./TextContentViewer";
+import type { UseTextSearchResult } from "../hooks/useTextSearch";
 
 const viewerConfig = {
   header: {

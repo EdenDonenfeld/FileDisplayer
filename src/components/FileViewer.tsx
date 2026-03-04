@@ -16,8 +16,8 @@ import {
 import { useMemo, useState } from "react";
 import { FileContentModal } from "./FileContentModal";
 import { ActionButton } from "./ActionButton";
-import { TextSearchBar } from "./components/TextSearchBar";
-import { useTextSearch } from "./hooks/useTextSearch";
+import { TextSearchBar } from "./TextSearchBar";
+import { useTextSearch } from "../hooks/useTextSearch";
 
 const supportedTypes = new Set(
   DocViewerRenderers.flatMap(
@@ -179,7 +179,7 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
         </DialogTitle>
         <DialogContent
           sx={{
-            p: 0,
+            p: 2,
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
