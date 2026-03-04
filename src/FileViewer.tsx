@@ -1,89 +1,144 @@
-import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer'
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import {
+  Check,
+  CheckRounded,
+  CloseRounded,
+  ContentCopyOutlined,
+  ContentCopyRounded,
+} from "@mui/icons-material";
+import { useMemo, useState } from "react";
+import { FileContentModal } from "./FileContentModal";
 
 const supportedTypes = new Set(
-  DocViewerRenderers.flatMap((r) => (r as { fileTypes?: string[] }).fileTypes ?? []),
-)
+  DocViewerRenderers.flatMap(
+    (r) => (r as { fileTypes?: string[] }).fileTypes ?? [],
+  ),
+);
 
 function getDocumentType(fileExtension: string | undefined): string {
-  return fileExtension && supportedTypes.has(fileExtension) ? fileExtension : 'txt'
+  return fileExtension && supportedTypes.has(fileExtension)
+    ? fileExtension
+    : "txt";
 }
 
 function getFileLabel(fileUrl: string, title?: string) {
-  if (title) return title
-  const parts = fileUrl.split('?')[0]?.split('#')[0]?.split('/') ?? []
-  return parts[parts.length - 1] || fileUrl
+  if (title) return title;
+  const parts = fileUrl.split("?")[0]?.split("#")[0]?.split("/") ?? [];
+  return parts[parts.length - 1] || fileUrl;
 }
 
-export interface FileViewerProps {
-  fileUrl: string
-  title?: string
-  buttonVariant?: 'text' | 'outlined' | 'contained'
-}
+export type DocItem = {
+  uri: string;
+  fileType: string;
+};
 
-export function FileViewer({ fileUrl, title, buttonVariant = 'outlined' }: FileViewerProps) {
-  const [open, setOpen] = useState(false)
+export type FileViewerProps = {
+  fileUrl: string;
+  title?: string;
+};
+
+export function FileViewer({ fileUrl, title }: FileViewerProps) {
+  const [open, setOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { docs, isTextBased, label } = useMemo(() => {
-    const fileExtension = fileUrl.split('?')[0]?.split('#')[0]?.split('.').pop()?.toLowerCase()
-    const documentType = getDocumentType(fileExtension)
+    const fileExtension = fileUrl
+      .split("?")[0]
+      ?.split("#")[0]
+      ?.split(".")
+      .pop()
+      ?.toLowerCase();
+    const documentType = getDocumentType(fileExtension);
 
     return {
       label: getFileLabel(fileUrl, title),
-      isTextBased: documentType === 'txt',
+      isTextBased: documentType === "txt",
       docs: [
         {
           uri: fileUrl,
           fileType: documentType,
         },
       ],
-    }
-  }, [fileUrl, title])
+    };
+  }, [fileUrl, title]);
 
   if (!fileUrl) {
-    return null
+    return null;
   }
+
+  const handleCopyContent = async () => {
+    try {
+      if (isTextBased) {
+        const response = await fetch(fileUrl);
+        const text = await response.text();
+        await navigator.clipboard.writeText(text);
+      } else {
+        await navigator.clipboard.writeText(fileUrl);
+      }
+
+      setIsCopied(true);
+
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
 
   return (
     <>
-      <Button variant={buttonVariant} onClick={() => setOpen(true)}>
+      <Button
+        sx={{ textTransform: "none" }}
+        size="small"
+        variant="contained"
+        onClick={() => setOpen(true)}
+      >
         {label}
       </Button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="lg">
-        <DialogTitle>{label}</DialogTitle>
-        <DialogContent dividers>
-          <Box
-            sx={{
-              height: '70vh',
-              ...(isTextBased
-                ? {
-                    fontFamily:
-                      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                    whiteSpace: 'pre-wrap',
-                    '& *': { whiteSpace: 'inherit' },
-                  }
-                : null),
-            }}
-            dir={isTextBased ? 'ltr' : 'auto'}
-          >
-            <DocViewer
-              documents={docs}
-              pluginRenderers={DocViewerRenderers}
-              config={{
-                header: {
-                  disableHeader: true,
-                },
-              }}
-              style={{ height: '100%', color: 'black' }}
-            />
-          </Box>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle>
+          <div className="flex flex-row justify-between items-center">
+            <Typography>{label}</Typography>
+            {isCopied ? (
+              <IconButton>
+                <CheckRounded color="success" fontSize="small" />
+              </IconButton>
+            ) : (
+              <IconButton onClick={handleCopyContent}>
+                <ContentCopyRounded fontSize="small" />
+              </IconButton>
+            )}
+          </div>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }} dividers>
+          <FileContentModal docs={docs} isTextBased={isTextBased} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Close</Button>
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={() => setOpen(false)}
+          >
+            <CloseRounded />
+          </IconButton>
         </DialogActions>
       </Dialog>
     </>
-  )
+  );
 }
