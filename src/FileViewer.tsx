@@ -9,15 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  CheckRounded,
   CloseRounded,
   CloudDownloadOutlined,
   ContentCopyRounded,
-  ErrorOutlineOutlined,
 } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { FileContentModal } from "./FileContentModal";
 import { ActionButton } from "./ActionButton";
+import { TextSearchBar } from "./components/TextSearchBar";
+import { useTextSearch } from "./hooks/useTextSearch";
 
 const supportedTypes = new Set(
   DocViewerRenderers.flatMap(
@@ -72,6 +72,9 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
       ],
     };
   }, [fileUrl, title]);
+
+  const fileUri = docs[0]?.uri;
+  const textSearch = useTextSearch(open && isTextBased ? fileUri : undefined);
 
   if (!fileUrl) {
     return null;
@@ -144,11 +147,17 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
         onClose={() => setOpen(false)}
         fullWidth
         maxWidth="lg"
+        PaperProps={{
+          sx: { maxHeight: "90vh" },
+        }}
       >
         <DialogTitle>
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row justify-between items-center flex-wrap gap-2">
             <Typography>{label}</Typography>
-            <div className="flex flex-row gap-1 items-center">
+            <div className="flex flex-row gap-1 items-center flex-wrap">
+              {isTextBased && (
+                <TextSearchBar {...textSearch} placeholder="חפש בקובץ" />
+              )}
               <ActionButton
                 title="העתק תוכן"
                 isSuccess={isCopied}
@@ -168,8 +177,20 @@ export function FileViewer({ fileUrl, title }: FileViewerProps) {
             </div>
           </div>
         </DialogTitle>
-        <DialogContent sx={{ p: 0 }} dividers>
-          <FileContentModal docs={docs} isTextBased={isTextBased} />
+        <DialogContent
+          sx={{
+            p: 0,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+          }}
+          dividers
+        >
+          <FileContentModal
+            docs={docs}
+            isTextBased={isTextBased}
+            textSearch={isTextBased ? textSearch : undefined}
+          />
         </DialogContent>
         <DialogActions>
           <IconButton

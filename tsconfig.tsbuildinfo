@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/fileviewer.tsx","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.9.3"}
+{"root":["./src/actionbutton.tsx","./src/app.tsx","./src/filecontentmodal.tsx","./src/fileviewer.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/textcontentviewer.tsx","./src/components/textsearchbar.tsx","./src/hooks/usetextsearch.ts"],"version":"5.9.3"}
