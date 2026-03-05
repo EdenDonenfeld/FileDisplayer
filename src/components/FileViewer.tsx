@@ -45,20 +45,18 @@ export type DocItem = {
 export type FileViewerProps = {
   fileUrl: string;
   title?: string;
+  extension?: string;
 };
 
-export function FileViewer({ fileUrl, title }: FileViewerProps) {
+export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
   const [open, setOpen] = useState(false);
   const [isCopied, setIsCopied] = useState<boolean | undefined>();
   const [isDownloaded, setIsDownloaded] = useState<boolean | undefined>();
 
   const { docs, isTextBased, label } = useMemo(() => {
-    const fileExtension = fileUrl
-      .split("?")[0]
-      ?.split("#")[0]
-      ?.split(".")
-      .pop()
-      ?.toLowerCase();
+    const fileExtension = extension
+      ? extension.split(".").pop()?.toLowerCase()
+      : fileUrl.split("?")[0]?.split("#")[0]?.split(".").pop()?.toLowerCase();
     const documentType = getDocumentType(fileExtension);
 
     return {
