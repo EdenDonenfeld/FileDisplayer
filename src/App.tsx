@@ -18,6 +18,10 @@ function App() {
           title="presentation.pptx"
         />
         <FileViewer fileUrl="/files/data.js" title="data.js" />
+        <FileViewer fileUrl="/files/index.css" title="index.css" />
+        <FileViewer fileUrl="/files/vite.svg" title="vite.svg" />
+        <FileViewer fileUrl="/files/hook.ts" title="hook.ts" />
+        <FileViewer fileUrl="/files/code.sh" title="code.sh" />
       </Stack>
     </div>
   );
