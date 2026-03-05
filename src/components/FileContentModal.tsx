@@ -2,10 +2,18 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import { DocItem } from "./FileViewer";
 import { TextContentViewer } from "./TextContentViewer";
 import type { UseTextSearchResult } from "../hooks/useTextSearch";
+import { CustomLoadingRenderer, CustomNoRenderer } from "./CustomRenderScreen";
 
 const viewerConfig = {
   header: {
     disableHeader: true,
+  },
+  loadingRenderer: {
+    overrideComponent: CustomLoadingRenderer,
+    showLoadingTimeout: 500,
+  },
+  noRenderer: {
+    overrideComponent: CustomNoRenderer,
   },
 };
 
