@@ -1,25 +1,22 @@
 # FileDisplayer
 
-A React TypeScript project built with [Vite](https://vitejs.dev/).
+A react project for displaying the content of files!
+Using the package: **_@cyntler/react-doc-viewer_**
 
-## Getting Started
+There are two types of files at the moment.
 
-### Install dependencies
-```bash
-npm install
-```
+- Those who can be searched in - we will call those TXT based.
+- And those who cannot.
 
-### Run development server
-```bash
-npm run dev
-```
+Thus, there is a different implementation in the code.
 
-### Build for production
-```bash
-npm run build
-```
+For the **TXT based files** - search, download and copy content is enabled.
+For the rest of the files - only download is enabled. copy is for copy file url and not content.
 
-### Preview production build
-```bash
-npm run preview
-```
+## Important Note for S3 integration!
+
+- We will have to get inside the settings of the bucket and add CORS, that allows our domain to extract files from there. Noticed this issue when tried to present PDF files!
+
+## Example:
+
+image.png
