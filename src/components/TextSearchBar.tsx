@@ -7,6 +7,8 @@ import {
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { UseTextSearchResult } from "../hooks/useTextSearch";
+import debounce from "lodash/debounce";
+import { useEffect, useMemo, useState } from "react";
 
 type TextSearchBarProps = {
   placeholder?: string;
@@ -24,14 +26,42 @@ export function TextSearchBar({
   handleNext,
   handlePrev,
 }: TextSearchBarProps) {
+  const [localQuery, setLocalQuery] = useState(searchQuery);
+
+  useEffect(() => {
+    setLocalQuery(searchQuery);
+  }, [searchQuery]);
+
+  const debouncedSetSearch = useMemo(
+    () =>
+      debounce((newVal: string) => {
+        setSearchQuery(newVal);
+      }, 500),
+    [setSearchQuery],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearch.cancel();
+    };
+  }, [debouncedSetSearch]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const value = e.target.value;
+    setLocalQuery(value);
+    debouncedSetSearch(value);
+  };
+
   return (
     <div className="flex flex-row items-center gap-1">
       <TextField
         size="small"
         variant="outlined"
         placeholder={placeholder}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={localQuery}
+        onChange={handleInputChange}
         error={!!regexError}
         helperText={regexError}
         className="w-64"
@@ -50,7 +80,7 @@ export function TextSearchBar({
           endAdornment: (
             <InputAdornment position="end">
               <Tooltip
-                title={useRegex ? "מצב רגקס" : "מצב רגיל"}
+                title={useRegex ? "עבור למצב רגיל" : "עבור למצב רגקס"}
                 placement="bottom"
               >
                 <IconButton
