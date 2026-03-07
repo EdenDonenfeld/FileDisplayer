@@ -19,16 +19,27 @@ import { ActionButton } from "./ActionButton";
 import { TextSearchBar } from "./TextSearchBar";
 import { useTextSearch } from "../hooks/useTextSearch";
 
-const supportedTypes = new Set(
-  DocViewerRenderers.flatMap(
-    (r) => (r as { fileTypes?: string[] }).fileTypes ?? [],
-  ),
-);
+// decide regarding htm / html - show raw or web view.
+const librarySupportedTypes = new Set([
+  "bmp",
+  "gif",
+  "htm",
+  "html",
+  "jpg",
+  "jpeg",
+  "pdf",
+  "png",
+  "tiff",
+]);
 
 function getDocumentType(fileExtension: string | undefined): string {
-  return fileExtension && supportedTypes.has(fileExtension)
-    ? fileExtension
-    : "txt";
+  if (!fileExtension) return "txt";
+
+  if (librarySupportedTypes.has(fileExtension)) {
+    return fileExtension;
+  }
+
+  return "txt";
 }
 
 function getFileLabel(fileUrl: string, title?: string) {

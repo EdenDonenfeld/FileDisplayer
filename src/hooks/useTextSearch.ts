@@ -5,6 +5,7 @@ export type SearchPart = { text: string; match: boolean };
 export type UseTextSearchResult = {
   content: string | null;
   isLoading: boolean;
+  isError: boolean;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   useRegex: boolean;
@@ -21,6 +22,7 @@ export function useTextSearch(
   fileUri: string | undefined,
 ): UseTextSearchResult {
   const [content, setContent] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [useRegex, setUseRegex] = useState(false);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
@@ -28,17 +30,37 @@ export function useTextSearch(
   useEffect(() => {
     if (!fileUri) {
       setContent(null);
+      setIsError(false);
       return;
     }
+
     let cancelled = false;
     setContent(null);
+    setIsError(false);
+
     fetch(fileUri)
-      .then((r) => r.text())
+      .then(async (r) => {
+        if (!r.ok) throw new Error("Fetch failed");
+        const contentLength = r.headers.get("content-length");
+        if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024)
+          throw new Error("File is too large (>5MB) to process as plain text.");
+        const text = await r.text();
+        if (text.indexOf("\0") !== -1)
+          throw new Error("File contains invalid or unreadable characters");
+        if (text.length > 500000) {
+          throw new Error("Text is too long to render safely");
+        }
+        return text;
+      })
       .then((text) => {
         if (!cancelled) setContent(text);
       })
-      .catch(() => {
-        if (!cancelled) setContent("");
+      .catch((err) => {
+        console.error("Text viewer error: ", err);
+        if (!cancelled) {
+          setContent("");
+          setIsError(true);
+        }
       });
     return () => {
       cancelled = true;
@@ -102,6 +124,7 @@ export function useTextSearch(
   return {
     content,
     isLoading: fileUri != null && content === null,
+    isError,
     searchQuery,
     setSearchQuery,
     useRegex,

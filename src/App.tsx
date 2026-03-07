@@ -1,28 +1,37 @@
 import { FileViewer } from "./components/FileViewer";
 import { Stack, Typography } from "@mui/material";
 
+// docx, pptx, xlsx (MS office) not working with local file urls - only public.
+
 function App() {
   return (
-    <div className="max-w-7xl mx-auto p-8 gap-4">
-      <div className="flex flex-col mb-10">
+    <div className="flex flex-col max-w-7xl mx-auto p-8 gap-8">
+      <div className="flex flex-col">
         <Typography variant="h4" sx={{ mb: 2 }}>
           Local Files
         </Typography>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           <FileViewer fileUrl="/files/hello.txt" title="hello.txt" />
-          <FileViewer fileUrl="/files/script.py" title="script.py" />
           <FileViewer fileUrl="/files/first_pdf.pdf" title="first_pdf.pdf" />
           <FileViewer fileUrl="/files/logo.png" title="logo.png" />
-          <FileViewer fileUrl="/files/document.docx" title="document.docx" />
+          <FileViewer fileUrl="/files/vite.svg" title="vite.svg" />
           <FileViewer
-            fileUrl="/files/presentation.pptx"
-            title="presentation.pptx"
+            fileUrl="/files/corgi-smiling.gif"
+            title="corgi-smiling.gif"
           />
+          <FileViewer fileUrl="/files/script.py" title="script.py" />
           <FileViewer fileUrl="/files/data.js" title="data.js" />
           <FileViewer fileUrl="/files/index.css" title="index.css" />
-          <FileViewer fileUrl="/files/vite.svg" title="vite.svg" />
           <FileViewer fileUrl="/files/hook.ts" title="hook.ts" />
           <FileViewer fileUrl="/files/code.sh" title="code.sh" />
+          <FileViewer fileUrl="/files/index.html" title="index.html" />
+          <FileViewer fileUrl="/files/component.tsx" title="component.tsx" />
+          <FileViewer
+            fileUrl="/files/csv-example.csv"
+            title="csv-example.csv"
+          />
+          <FileViewer fileUrl="/files/names-csv.csv" title="names-csv.csv" />
+          <FileViewer fileUrl="/files/home.zip" title="home.zip" />
         </Stack>
       </div>
       <div className="flex flex-col">
@@ -32,16 +41,33 @@ function App() {
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           <FileViewer
             fileUrl="https://jsonplaceholder.typicode.com/todos/1"
-            title="mock json"
+            title="json"
           />
           <FileViewer
             fileUrl="https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"
-            title="mock png"
+            title="png"
           />
           <FileViewer
             fileUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
-            title="mock pdf"
+            title="pdf"
           />
+          <FileViewer
+            fileUrl="https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/dash/BigBuckBunnyVideo.mp4"
+            title="mp4"
+          />
+        </Stack>
+      </div>
+      <div className="flex flex-col">
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Not Supported Files
+        </Typography>
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          <FileViewer fileUrl="/files/document.docx" title="document.docx" />
+          <FileViewer
+            fileUrl="/files/presentation.pptx"
+            title="presentation.pptx"
+          />
+          <FileViewer fileUrl="/files/names.xlsx" title="names.xlsx" />
         </Stack>
       </div>
     </div>
