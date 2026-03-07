@@ -31,7 +31,7 @@ export function FileContentModal({
         </Typography>
         <Typography color="textSecondary" variant="body2">
           ייתכן שהקובץ גדול מדי לתצוגה מקדימה, או שהוא מכיל תוכן לא קריא.
-          באפשרותך להוריד את הקובץ.
+          באפשרותך להוריד את הקובץ
         </Typography>
       </div>
     );

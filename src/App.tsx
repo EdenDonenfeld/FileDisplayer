@@ -1,8 +1,6 @@
 import { FileViewer } from "./components/FileViewer";
 import { Stack, Typography } from "@mui/material";
 
-// docx, pptx, xlsx (MS office) not working with local file urls - only public.
-
 function App() {
   return (
     <div className="flex flex-col max-w-7xl mx-auto p-8 gap-8">
@@ -31,7 +29,6 @@ function App() {
             title="csv-example.csv"
           />
           <FileViewer fileUrl="/files/names-csv.csv" title="names-csv.csv" />
-          <FileViewer fileUrl="/files/home.zip" title="home.zip" />
         </Stack>
       </div>
       <div className="flex flex-col">
@@ -51,10 +48,6 @@ function App() {
             fileUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
             title="pdf"
           />
-          <FileViewer
-            fileUrl="https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/dash/BigBuckBunnyVideo.mp4"
-            title="mp4"
-          />
         </Stack>
       </div>
       <div className="flex flex-col">
@@ -62,12 +55,14 @@ function App() {
           Not Supported Files
         </Typography>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          <FileViewer fileUrl="/files/document.docx" title="document.docx" />
+          <FileViewer fileUrl="/files/document.docx" title="docx" />
+          <FileViewer fileUrl="/files/presentation.pptx" title="pptx" />
+          <FileViewer fileUrl="/files/names.xlsx" title="xlsx" />
           <FileViewer
-            fileUrl="/files/presentation.pptx"
-            title="presentation.pptx"
+            fileUrl="https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/dash/BigBuckBunnyVideo.mp4"
+            title="mp4"
           />
-          <FileViewer fileUrl="/files/names.xlsx" title="names.xlsx" />
+          <FileViewer fileUrl="/files/home.zip" title="zip" />
         </Stack>
       </div>
     </div>
