@@ -19,4 +19,4 @@ For the rest of the files - only download is enabled. copy is for copy file url 
 
 ## Example:
 
-image.png
+<img width="1827" height="783" alt="image" src="https://github.com/user-attachments/assets/c3a6eea3-c298-4f4b-a682-de484974620c" />
