@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+const FILE_LIMIT = 5 * 1024 * 1024;
+
 export type SearchPart = { text: string; match: boolean };
 
 export type UseTextSearchResult = {
@@ -42,8 +44,10 @@ export function useTextSearch(
       .then(async (r) => {
         if (!r.ok) throw new Error("Fetch failed");
         const contentLength = r.headers.get("content-length");
-        if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024)
-          throw new Error("File is too large (>5MB) to process as plain text.");
+        if (contentLength && parseInt(contentLength, 10) > FILE_LIMIT)
+          throw new Error(
+            "File is too large (> 5MB) to process as plain text.",
+          );
         const text = await r.text();
         if (text.indexOf("\0") !== -1)
           throw new Error("File contains invalid or unreadable characters");
