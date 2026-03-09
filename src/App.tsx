@@ -23,6 +23,7 @@ function App() {
           <FileViewer fileUrl="/files/hook.ts" title="hook.ts" />
           <FileViewer fileUrl="/files/code.sh" title="code.sh" />
           <FileViewer fileUrl="/files/index.html" title="index.html" />
+          <FileViewer fileUrl="/files/page.html" title="page.html" />
           <FileViewer fileUrl="/files/component.tsx" title="component.tsx" />
           <FileViewer
             fileUrl="/files/csv-example.csv"

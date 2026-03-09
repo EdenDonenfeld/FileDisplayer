@@ -1,4 +1,3 @@
-import { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import {
   Button,
   Dialog,
@@ -7,24 +6,25 @@ import {
   DialogTitle,
   IconButton,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import {
   CloseRounded,
   CloudDownloadOutlined,
   ContentCopyRounded,
+  CodeRounded,
+  LanguageRounded,
 } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { FileContentModal } from "./FileContentModal";
 import { ActionButton } from "./ActionButton";
 import { TextSearchBar } from "./TextSearchBar";
 import { useTextSearch } from "../hooks/useTextSearch";
+import { useFileContent } from "../hooks/useFileContent";
 
-// decide regarding htm / html - show raw or web view.
 const librarySupportedTypes = new Set([
   "bmp",
   "gif",
-  "htm",
-  "html",
   "jpg",
   "jpeg",
   "pdf",
@@ -34,11 +34,9 @@ const librarySupportedTypes = new Set([
 
 function getDocumentType(fileExtension: string | undefined): string {
   if (!fileExtension) return "txt";
-
   if (librarySupportedTypes.has(fileExtension)) {
     return fileExtension;
   }
-
   return "txt";
 }
 
@@ -63,27 +61,32 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
   const [open, setOpen] = useState(false);
   const [isCopied, setIsCopied] = useState<boolean | undefined>();
   const [isDownloaded, setIsDownloaded] = useState<boolean | undefined>();
+  const [isHtmlRawView, setIsHtmlRawView] = useState(false);
 
-  const { docs, isTextBased, label } = useMemo(() => {
+  const { docs, isHtml, isTextBased, label } = useMemo(() => {
     const fileExtension = extension
       ? extension.split(".").pop()?.toLowerCase()
       : fileUrl.split("?")[0]?.split("#")[0]?.split(".").pop()?.toLowerCase();
-    const documentType = getDocumentType(fileExtension);
+
+    const baseDocumentType = getDocumentType(fileExtension);
+    const htmlCheck = fileExtension === "html" || fileExtension === "htm";
+
+    const checkIsTextBased = htmlCheck
+      ? isHtmlRawView
+      : baseDocumentType === "txt";
 
     return {
       label: getFileLabel(fileUrl, title),
-      isTextBased: documentType === "txt",
-      docs: [
-        {
-          uri: fileUrl,
-          fileType: documentType,
-        },
-      ],
+      isHtml: htmlCheck,
+      isTextBased: checkIsTextBased,
+      docs: [{ uri: fileUrl, fileType: baseDocumentType }],
     };
-  }, [fileUrl, title]);
+  }, [fileUrl, title, extension, isHtmlRawView]);
 
-  const fileUri = docs[0]?.uri;
-  const textSearch = useTextSearch(open && isTextBased ? fileUri : undefined);
+  const fetchUri = open && isTextBased ? docs[0]?.uri : undefined;
+  const { content, isLoading, isError, isBinary } = useFileContent(fetchUri);
+
+  const textSearch = useTextSearch(content);
 
   if (!fileUrl) {
     return null;
@@ -91,19 +94,13 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
 
   const handleCopyContent = async () => {
     try {
-      if (isTextBased) {
-        const response = await fetch(fileUrl);
-        const text = await response.text();
-        await navigator.clipboard.writeText(text);
+      if (isTextBased && !isError) {
+        await navigator.clipboard.writeText(content ?? "");
       } else {
         await navigator.clipboard.writeText(fileUrl);
       }
-
       setIsCopied(true);
-
-      setTimeout(() => {
-        setIsCopied(undefined);
-      }, 2000);
+      setTimeout(() => setIsCopied(undefined), 2000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
       setIsCopied(false);
@@ -114,23 +111,17 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
     try {
       const response = await fetch(fileUrl);
       const blob = await response.blob();
-
       const blobUrl = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = blobUrl;
       link.download = label;
       document.body.appendChild(link);
       link.click();
-
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
 
       setIsDownloaded(true);
-
-      setTimeout(() => {
-        setIsDownloaded(undefined);
-      }, 2000);
+      setTimeout(() => setIsDownloaded(undefined), 2000);
     } catch (err) {
       console.error("Failed to download file: ", err);
       setIsDownloaded(false);
@@ -162,11 +153,30 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
       >
         <DialogTitle>
           <div className="flex flex-row justify-between items-center flex-wrap gap-2">
-            <Typography>{label}</Typography>
+            <div className="flex flex-row items-center gap-2">
+              <Typography>{label}</Typography>
+              {isHtml && (
+                <Tooltip
+                  title={isHtmlRawView ? "עבור לתצוגת Web" : "עבור לתצוגת קוד"}
+                >
+                  <IconButton
+                    onClick={() => setIsHtmlRawView(!isHtmlRawView)}
+                    size="small"
+                  >
+                    {isHtmlRawView ? (
+                      <LanguageRounded fontSize="small" />
+                    ) : (
+                      <CodeRounded fontSize="small" />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              )}
+            </div>
             <div className="flex flex-row gap-1 items-center flex-wrap">
-              {isTextBased && (
+              {isTextBased && !isError && (
                 <TextSearchBar {...textSearch} placeholder="חפש בקובץ" />
               )}
+
               <ActionButton
                 title="העתק תוכן"
                 isSuccess={isCopied}
@@ -186,18 +196,15 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
             </div>
           </div>
         </DialogTitle>
-        <DialogContent
-          sx={{
-            p: 2,
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-          }}
-          dividers
-        >
+
+        <DialogContent className="flex flex-col p-2 overflow-hidden" dividers>
           <FileContentModal
             docs={docs}
             isTextBased={isTextBased}
+            isLoading={isLoading}
+            isError={isError}
+            isHtml={isHtml}
+            isBinary={isBinary}
             textSearch={isTextBased ? textSearch : undefined}
           />
         </DialogContent>

@@ -14,15 +14,23 @@ const viewerConfig = {
 type FileContentModalProps = {
   docs: DocItem[];
   isTextBased: boolean;
+  isLoading: boolean;
+  isError: boolean;
+  isHtml: boolean;
+  isBinary: boolean;
   textSearch?: UseTextSearchResult;
 };
 
 export function FileContentModal({
   docs,
   isTextBased,
+  isLoading,
+  isError,
+  isHtml,
+  isBinary,
   textSearch,
 }: FileContentModalProps) {
-  if (textSearch && textSearch.isError) {
+  if (isTextBased && isError) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 h-full bg-slate-50 rounded-md gap-2 text-red-500 p-8 text-center">
         <ErrorOutlineOutlined fontSize="large" color="inherit" />
@@ -30,8 +38,8 @@ export function FileContentModal({
           לא ניתן להציג את תוכן הקובץ
         </Typography>
         <Typography color="textSecondary" variant="body2">
-          ייתכן שהקובץ גדול מדי לתצוגה מקדימה, או שהוא מכיל תוכן לא קריא.
-          באפשרותך להוריד את הקובץ
+          ייתכן שהקובץ גדול מדי לתצוגה מקדימה, או שאינו נתמך. באפשרותך להוריד
+          אותו
         </Typography>
       </div>
     );
@@ -39,13 +47,32 @@ export function FileContentModal({
 
   if (isTextBased && textSearch) {
     return (
-      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden relative">
+        {isBinary && (
+          <div
+            dir="rtl"
+            className="bg-slate-100 py-2 text-sm text-center rounded-sm"
+          >
+            תצוגה קובץ בינארי (4KB ראשונים): בשביל תצוגה מלאה ניתן להוריד את
+            הקובץ
+          </div>
+        )}
         <TextContentViewer
           parts={textSearch.parts}
           currentMatchIndex={textSearch.currentMatchIndex}
-          isLoading={textSearch.isLoading}
+          isLoading={isLoading}
         />
       </div>
+    );
+  }
+
+  if (isHtml && !isTextBased) {
+    return (
+      <iframe
+        className="flex flex-col overflow-auto h-[70vh]"
+        src={docs[0]?.uri}
+        title="HTML Web View"
+      />
     );
   }
 
