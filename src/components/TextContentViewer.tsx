@@ -13,11 +13,15 @@ export function TextContentViewer({
   isLoading,
 }: TextContentViewerProps) {
   const matchRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  matchRefs.current = [];
 
   useEffect(() => {
-    const ref = matchRefs.current[currentMatchIndex];
-    ref?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [currentMatchIndex]);
+    const timer = setTimeout(() => {
+      const ref = matchRefs.current[currentMatchIndex];
+      ref?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 10);
+    return () => clearTimeout(timer);
+  }, [currentMatchIndex, parts]);
 
   return (
     <div

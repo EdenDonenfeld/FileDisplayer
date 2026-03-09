@@ -148,7 +148,7 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
         fullWidth
         maxWidth="lg"
         PaperProps={{
-          sx: { maxHeight: "90vh" },
+          sx: { maxHeight: "90vh", width: "80vw" },
         }}
       >
         <DialogTitle>
@@ -178,7 +178,9 @@ export function FileViewer({ fileUrl, title, extension }: FileViewerProps) {
               )}
 
               <ActionButton
-                title="העתק תוכן"
+                title={
+                  isTextBased && !isError ? "העתק תוכן" : "העתק קישור לקובץ"
+                }
                 isSuccess={isCopied}
                 handleAction={handleCopyContent}
                 actionIcon={
